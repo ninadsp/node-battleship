@@ -110,6 +110,10 @@ var Room = function(id) {
     };
 
     var addClient = function(clientId) {
+	if (_clients.length >= 2) {
+	    throw "This room is full";
+	}
+
 	var newClient = Client(clientId);
 	_clients.push(newClient);
     };
@@ -122,17 +126,33 @@ var Room = function(id) {
 		break;
 	    }
 	}
+
+	if (i === _clients.length) {
+	    throw "Invalid clientId";
+	}
     };
 
     var fireShot = function(clientId, location) {
 	var i;
+
+	// validate clientId
 	for (i = 0; i < _clients.length; i += 1) {
-	    // Find the other client
-	    if (_clients[i].getId() != clientId) {
-		_clients[i].checkForHit(location);
+	    if (_clients[i].getId() === clientId) {
 		break;
 	    }
 	}
+
+	if (i === _clients.length)
+	    throw "Invalid clientId";
+
+	for (i = 0; i < _clients.length; i += 1) {
+	    // Find the other client
+	    if (_clients[i].getId() != clientId) {
+		return _clients[i].checkForHit(location);
+	    }
+	}
+
+	throw "Client " + clientId + " not found";
     };
 
     return {
