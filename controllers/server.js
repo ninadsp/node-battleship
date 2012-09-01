@@ -11,41 +11,32 @@ var createRoom = function () {
 };
 
 var joinRoom = function (roomId, clientId) {
-    var room = null, i = 0;
+    var i = 0;
     for (i = 0; i < roomList.length; i++) {
 	if (roomList[i].getId() == roomId) {
-	    room = roomList[i];
-	    try {
-		room.addClient(clientId);
-	    }
-	    catch (e) {
-		throw e;
-	    }
-	    break;
+	    roomList[i].addClient(clientId);
+	    return;
 	}
     }
-    if (room == null) {
-	throw "Sorry, I can't find this room on my Marauder's map !!! ";
-    }
+
+    throw "Sorry, I can't find room " + roomId + " on my Marauder's map !!! ";
 };
 
-var placeShips = function (roomId, clientId, ships) {
-    var room = null, i = 0;
+var placeShips = function (roomId, clientId, ships, readyCallback) {
+    var i = 0;
     for (i = 0; i < roomList.length; i++) {
 	if (roomList[i].getId() == roomId) {
-	    room = roomList[i];
-	    try {
-		room.placeShips(clientId, ships);
+	    roomList[i].placeShips(clientId, ships);
+	    if (roomList[i].areClientsReady() &&
+		readyCallback !== null &&
+		typeof(readyCallback) === 'function') {
+		readyCallback(roomList[i].getClientIds());
 	    }
-	    catch (e) {
-		throw e;
-	    }
-	    break;
+	    return;
 	}
     }
-    if (room == null) {
-	throw "Sorry, I can't find this room on my Marauder's map !!! ";
-    }
+
+    throw "Sorry, I can't find room " + roomId + " on my Marauder's map !!! ";
 };
 
 var fireShot = function (roomId, clientId, location) {
@@ -53,16 +44,11 @@ var fireShot = function (roomId, clientId, location) {
     for (i = 0; i < roomList.length; i++) {
 	if (roomList[i].getId == roomId) {
 	    room = roomList[i];
-	    try {
-		ret = room.fireShot(clientId, location); // returns JSON object {type: , location: , ship: }
-		return ret;
-	    }
-	    catch (e) {
-		throw e;
-	    }
-	    break;
+	    return room.fireShot(clientId, location); // returns JSON object {type: , location: , ship: }
 	}
     }
+
+    throw "Sorry, I can't find room " + roomId + " on my Marauder's map !!! ";
 };
 
 exports.createRoom = createRoom;
