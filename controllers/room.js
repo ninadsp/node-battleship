@@ -70,13 +70,17 @@ var Client = function(clientId) {
 	_ships = ships;
     };
 
-    var checkForHit = function(location) {
+    var checkForHit = function(shooterId, location) {
 	var i, j, k;
+	var shipIter;
 
 	var shotResult = {
 	    location: location,
 	    type: "miss",
-	    ship: []
+	    ship: [],
+	    shooter: shooterId,
+	    target: _id,
+	    allSunk: false
 	};
 
 	for (i = 0; i < _ships.length; i += 1) {
@@ -93,6 +97,7 @@ var Client = function(clientId) {
 		    }
 
 		    _ships[i].cellsHit.push(location);
+
 		    if (_ships[i].cellsHit.length === _ships[i].cellsOccupied.length) {
 			shotResult.type = "sink";
 			shotResult.ship = _ships[i].cellsOccupied;
@@ -105,10 +110,29 @@ var Client = function(clientId) {
 	    }
 	}
 
+	if (shotResult.type === "sink") {
+	    // check for win/lose condition
+	    for (shipIter = 0; shipIter < _ships.length; shipIter += 1) {
+		if (_ships[shipIter].cellsHit.length == _ships[shipIter].cellsOccupied.length) {
+		    shotResult.allSunk = true;
+		}
+	    }
+	}
+
 	return shotResult;
     };
 
     var fireShot = function(location) {
+	var i;
+
+	for (i = 0; i < _shots.length; i += 1) {
+	    if (_shots[i][0] === location[0] &&
+		_shots[i][1] === location[1]) {
+		throw "Tried to fire a shot at " + location + " twice.";
+	    }
+	}
+
+	_shots.push(location);
     };
 
     return {
@@ -152,11 +176,13 @@ var Room = function(id) {
 
     var fireShot = function(clientId, location) {
 	var i;
+	var shooterId;
 
 	// validate clientId
 	for (i = 0; i < _clients.length; i += 1) {
 	    if (_clients[i].getId() === clientId) {
 		_clients[i].fireShot(location);
+		shooterId = _clients[i].getId();
 		break;
 	    }
 	}
@@ -167,7 +193,7 @@ var Room = function(id) {
 	for (i = 0; i < _clients.length; i += 1) {
 	    // Find the other client
 	    if (_clients[i].getId() != clientId) {
-		return _clients[i].checkForHit(location);
+		return _clients[i].checkForHit(shooterId, location);
 	    }
 	}
 
