@@ -101,12 +101,12 @@ var Client = function(clientId) {
     };
 };
 
-var Room = function(roomName) {
-    var _name = roomName;
+var Room = function(id) {
+    var _id = id;
     var _clients = [];
 
-    var getName = function() {
-	return _name;
+    var getId = function() {
+	return _id;
     };
 
     var addClient = function(clientId) {
@@ -136,9 +136,10 @@ var Room = function(roomName) {
     };
 
     return {
-	getName: getName,
+	getId: getId,
 	placeShips: placeShips,
-	fireShot: fireShot
+	fireShot: fireShot,
+	addClient: addClient
     };
 };
 
