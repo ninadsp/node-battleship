@@ -111,11 +111,17 @@ var Client = function(clientId) {
 	}
 
 	if (shotResult.type === "sink") {
+	    var sunkCount = 0;
 	    // check for win/lose condition
 	    for (shipIter = 0; shipIter < _ships.length; shipIter += 1) {
-		if (_ships[shipIter].cellsHit.length == _ships[shipIter].cellsOccupied.length) {
-		    shotResult.allSunk = true;
+		if (_ships[shipIter].cellsHit.length ==
+		    _ships[shipIter].cellsOccupied.length) {
+		    sunkCount += 1;
 		}
+	    }
+
+	    if (_ships.length === sunkCount) {
+		shotResult.allSunk = true;
 	    }
 	}
 
