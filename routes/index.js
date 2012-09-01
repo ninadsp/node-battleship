@@ -1,4 +1,5 @@
 exports.index = function(req, res){
-	res.sendfile(index.html);
+	console.log('Request received');
+	res.sendfile(__dirname + '/../public/index.html');
 };
 
