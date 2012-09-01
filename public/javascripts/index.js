@@ -1,6 +1,6 @@
 $(document).ready(function() {
 	
-	var socket = io.connect("/battleship");
+	var socket = io.connect("/battleships");
 
 	socket.on('connect', function(d) {
 		var pathname = window.location.pathname;
