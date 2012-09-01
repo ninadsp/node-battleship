@@ -141,11 +141,16 @@ var Client = function(clientId) {
 	_shots.push(location);
     };
 
+    var isClientReady = function() {
+	return _placed;
+    };
+
     return {
 	getId: getId,
 	placeShips: placeShips,
 	checkForHit: checkForHit,
-	fireShot: fireShot
+	fireShot: fireShot,
+	isClientReady: isClientReady
     };
 };
 
@@ -206,11 +211,37 @@ var Room = function(id) {
 	throw "Client " + clientId + " not found";
     };
 
+    var areClientsReady = function() {
+	var i;
+	var readyCount;
+
+	for (i = 0; i < _clients.length; i += 1) {
+	    if (_clients[i].isClientReady()) {
+		readyCount += 1;
+	    }
+	}
+
+	return (readyCount === _clients.length);
+    };
+
+    var getClientIds = function() {
+	var clientIds = [];
+	var i;
+
+	for (i = 0; i < _clients.length; i += 1) {
+	    clientIds.push(_clients[i].getId());
+	}
+
+	return clientIds;
+    };
+
     return {
 	getId: getId,
 	placeShips: placeShips,
 	fireShot: fireShot,
-	addClient: addClient
+	addClient: addClient,
+	areClientsReady: areClientsReady,
+	getClientIds: getClientIds
     };
 };
 
