@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title></title>
+        <style type="text/css">
+
+            #opponentBoard{
+                display: inline-block;
+            }
+
+            .opponentBoardCell {
+                width: 50px; height: 50px;
+                padding:0px;margin:0px;
+            }
+
+            .opponentBoardCellDefault
+            {
+                cursor: crosshair;
+                background-color: lightblue;
+            }
+
+            .opponentBoardSink {
+                background-color: red;
+            }
+
+            .opponentBoardHit {
+                background-color: orange;
+            }
+
+            .opponentBoardMiss {
+                background-color: gray;
+            }
+        </style>
+        <style>
+            .carrier {background-color: #ffcc00;}
+            .battleship {background-color: #000000;}
+            .submarine {background-color: #cccc00;}
+            .destroyer {background-color: #ff00ff;}
+            .boat {background-color: #cccccc;}
+
+            div.carrier {width:255px;height:50px;}
+            div.battleship {width:205px;height:50px;}
+            div.submarine {width:155px;height:50px;}
+            div.destroyer {width:155px;height:50px;}
+            div.boat {width:105px;height:50px;}
+        </style>
+        <style>
+            .rotate0
+            {
+                /*General*/
+                transform: rotate(0deg);
+                /*Firefox*/
+                -moz-transform: rotate(0deg);
+                /*Microsoft Internet Explorer*/
+                -ms-transform: rotate(0deg);
+                /*Chrome, Safari*/
+                -webkit-transform: rotate(0deg);
+                /*Opera*/
+                -o-transform: rotate(0deg);
+            }
+
+            .rotate90
+            {
+                /*General*/
+                transform: rotate(90deg);
+                /*Firefox*/
+                -moz-transform: rotate(90deg);
+                /*Microsoft Internet Explorer*/
+                -ms-transform: rotate(90deg);
+                /*Chrome, Safari*/
+                -webkit-transform: rotate(90deg);
+                /*Opera*/
+                -o-transform: rotate(90deg);
+            }
+        </style>
+        <script type="text/javascript" src="./js/jquery-1.7.2.min.js">
+        </script>
+        <script type="text/javascript" src="./js/jquery-ui-1.8.23.custom.min.js"></script>
+        <script type="text/javascript">
+            
+            function Ship(shipType, shipPoints)
+            {
+                this.type = shipType;
+                this.cellsOccupied = shipPoints;
+            }
+            
+            var Ships = {
+                "carrier"   : new Ship("carrier"),
+                "battleship": new Ship("battleship"),
+                "submarine" : new Ship("submarine"),
+                "destroyer" : [new Ship("destroyer"),new Ship("destroyer")],
+                "boat"      : [new Ship("boat"), new Ship("boat")],
+                "setLocation" : function(ship, shipPoints){
+                    ship.cellsOccupied = shipPoints;
+                }
+            }
+            
+            var Battleship = {
+                "boardSize" : 10
+            }
+        
+            function loadOpponentBoard()
+            {
+                var opponentBoard = document.createElement("TABLE");
+                for(var opponentBoardRowCount = 1; opponentBoardRowCount<= Battleship.boardSize; opponentBoardRowCount++)
+                {
+                    var opponentBoardRow = document.createElement("TR");
+                    for(var opponentBoardColumnCount = 1; opponentBoardColumnCount <= Battleship.boardSize; opponentBoardColumnCount++)
+                    {
+                        var opponentBoardColumn = document.createElement("TD");
+                        opponentBoardColumn.className = "opponentBoardCell opponentBoardCellDefault";
+                        opponentBoardColumn.id = "opponentBoard" + "-" + opponentBoardRowCount + "-" + opponentBoardColumnCount;
+                        opponentBoardRow.appendChild(opponentBoardColumn);
+                    }
+                    opponentBoard.appendChild(opponentBoardRow);
+                }
+                document.getElementById("opponentBoard").appendChild(opponentBoard);
+            }
+            
+            function hitOpponentBoardCell(data)
+            {
+                var eventType = (data.type + "").capitalize();
+                var eventCell = $("#opponentBoard-" + data.location[0] + "-" + data.location[1]);
+                if(eventType == "Sink")
+                {
+                    for(var cellCount = 0; cellCount < data.ship.length; cellCount++)
+                    {
+                        $("#opponentBoard-" + data.ship[cellCount][0] + "-" + data.ship[cellCount][1]).addClass("opponentBoardSink");
+                    }
+                }
+                else
+                {
+                    eventCell.addClass("opponentBoard" + eventType);
+                }
+            }
+            
+            String.prototype.capitalize = function() {
+                return this.charAt(0).toUpperCase() + this.slice(1);
+            }
+            
+            var TestData = {
+                shotResult : {
+                    "type": "hit",
+                    "location": [5, 6],
+                    "ship": [[5, 6], [5, 7], [5, 8]]
+                }
+            }
+            
+            function placeShip(shipType,cellsOccupied)
+            {
+                for(var cellCount = 0 ; cellCount < cellsOccupied.length; cellCount++)
+                {
+                    $("#opponentBoard-" + cellsOccupied[cellCount][0] + "-" + cellsOccupied[cellCount][1]).addClass(shipType);
+                }
+            }
+            
+            function fireShot(location)
+            {
+                //TODO: Fire Shot on location [x,y]
+            }
+            
+            function placeShips()
+            {
+                if(Ships.carrier.cellsOccupied != "undefined")
+                {
+                    placeShip("carrier",Ships.carrier.cellsOccupied);
+                }
+                if(Ships.battleship.cellsOccupied != "undefined")
+                {
+                    placeShip("battleship",Ships.battleship.cellsOccupied);
+                }
+                if(Ships.submarine.cellsOccupied != "undefined")
+                {
+                    placeShip("submarine",Ships.submarine.cellsOccupied);
+                }
+                if(Ships.destroyer[0].cellsOccupied != "undefined")
+                {
+                    placeShip("destroyer",Ships.destroyer[0].cellsOccupied);
+                }
+                if(Ships.destroyer[1].cellsOccupied != "undefined")
+                {
+                    placeShip("destroyer",Ships.destroyer[1].cellsOccupied);
+                }
+                if(Ships.boat[0].cellsOccupied != "undefined")
+                {
+                    placeShip("boat",Ships.boat[0].cellsOccupied);
+                }
+                if(Ships.boat[1].cellsOccupied != "undefined")
+                {
+                    placeShip("boat",Ships.boat[1].cellsOccupied);
+                }
+            }
+            
+            function initShips()
+            {
+                $("#opponentBoard").droppable();
+                $("#ship-carrier").draggable({snap : ".opponentBoardCell", snapMode: "both", scroll: false, grid: [5,5], revert:"invalid" });
+                $("#ship-battleship").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+                $("#ship-submarine").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+                $("#ship-destroyer1").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+                $("#ship-destroyer2").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+                $("#ship-boat1").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+                $("#ship-boat2").draggable({ opacity: 0.7, helper: "clone", containment: "#opponentBoard", scroll: false });
+            }
+            
+            $(document).ready(function(){
+                loadOpponentBoard();
+                Ships.setLocation(Ships.carrier,[[1,2],[1,3],[1,4],[1,5],[1,6]]);
+                Ships.setLocation(Ships.battleship,[[5,6],[5,7],[5,8],[5,9]]);
+                Ships.setLocation(Ships.submarine,[[7,4],[8,4],[9,4]]);
+                Ships.setLocation(Ships.destroyer[0],[[9,9],[9,8],[9,7]]);
+                Ships.setLocation(Ships.destroyer[1],[[3,3],[3,4],[3,5]]);
+                Ships.setLocation(Ships.boat[0],[[2,8],[3,8]]);
+                Ships.setLocation(Ships.boat[1],[[8,8],[8,9]]);
+                //placeShips();
+                
+                shipset = [];
+                shipset.push(Ships.carrier);
+                shipset.push(Ships.battleship);
+                shipset.push(Ships.submarine);
+                shipset.push(Ships.destroyer[0]);
+                shipset.push(Ships.destroyer[1]);
+                shipset.push(Ships.boat[0]);
+                shipset.push(Ships.boat[1]);
+                console.log(JSON.stringify(shipset));
+                
+                
+                initShips();
+                $(".rotate0").live("click",function(){$(this).addClass("rotate90").removeClass("rotate0");});
+                $(".rotate90").live("click",function(){$(this).addClass("rotate180").removeClass("rotate90");});
+                $(".rotate180").live("click",function(){$(this).addClass("rotate270").removeClass("rotate180");});
+                $(".rotate270").live("click",function(){$(this).addClass("rotate0").removeClass("rotate270");});
+            });
+        </script>
+    </head>
+    <body>
+        <div id="opponentBoard"><div></div></div>
+        <div id="myHarbour">
+            <div class="carrier draggable rotate0" id="ship-carrier"><div> </div></div>
+            <div class="battleship draggable rotate0" id="ship-battleship"><div> </div></div>
+            <div class="submarine draggable rotate0" id="ship-submarine"><div> </div></div>
+            <div class="destroyer draggable rotate0" id="ship-destroyer1"><div> </div></div>
+            <div class="destroyer draggable rotate0" id="ship-destroyer2"><div> </div></div>
+            <div class="boat draggable rotate0" id="ship-boat1"><div> </div></div>
+            <div class="boat draggable rotate0" id="ship-boat2"><div> </div></div>
+        </div>
+    </body>
+</html>

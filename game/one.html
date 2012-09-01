@@ -1,0 +1,248 @@
+<!DOCTYPE HTML>
+<html>
+<body>
+<link rel="stylesheet" type="text/css" href="game.css" />
+<link type="text/css" href="css/ui-lightness/jquery-ui-1.8.21.custom.css" rel="stylesheet" />
+<script type="text/javascript" src="js/jquery-1.7.2.min.js"></script>
+<script type="text/javascript" src="js/jquery-ui-1.8.21.custom.min.js"></script>
+</script>
+<style>
+	#feedback { font-size: 1em; }
+	#selectable .ui-selecting { background: #FECA40; }
+	#selectable .ui-selected { background: #F39814; color: white; }
+	#selectable { list-style-type: none; margin: 0; padding: 0; }
+	#selectable li {   margin: 3px; font-size: 1em;   }
+	</style>
+	
+	<style type="text/css">
+
+            #opponentBoard{
+                display: inline-block;
+            }
+
+            .opponentBoardCell {
+                width: 50px; height: 50px;
+                padding:0px;margin:0px;
+            }
+
+            .opponentBoardCellDefault
+            {
+                cursor: crosshair;
+                background-color: lightblue;
+            }
+
+            .opponentBoardSink {
+                background-color: red;
+            }
+
+            .opponentBoardHit {
+                background-color: orange;
+            }
+
+            .opponentBoardMiss {
+                background-color: gray;
+            }
+        </style>
+	
+<script>
+
+	function Ship(shipType, shipPoints)
+            {
+                this.type = shipType;
+                this.cellsOccupied = shipPoints;
+            }
+            
+            var Ships = {
+                "carrier"   : new Ship("carrier"),
+                "battleship": new Ship("battleship"),
+                "submarine" : new Ship("submarine"),
+                "destroyer" : [new Ship("destroyer"),new Ship("destroyer")],
+                "boat"      : [new Ship("boat"), new Ship("boat")],
+                "setLocation" : function(ship, shipPoints){
+                    ship.cellsOccupied = shipPoints;
+                }
+            }
+
+
+
+	$(function() {
+	
+		
+
+	$( ".draggable" ).draggable({ snap: ".myBoardCell", snapMode: "inner", revert: "invalid" , containment: "#grid" ,
+	start: function(event, ui) {
+
+        // Show start dragged position of image.
+        var Startpos = $(this).position();
+       // alert("START: \nLeft: "+ Startpos.left + "\nTop: " + Startpos.top);
+	   
+    },
+
+    // Find position where image is dropped.
+    stop: function(event, ui) {
+		//alert(this.id);
+        // Show dropped position.
+        var Stoppos = $(this).position();
+      // alert("STOP: \nLeft: "+ Stoppos.left + "\nTop: " + Stoppos.top);
+	   var x=Math.floor(Stoppos.left/50)+1;
+	   var y=Math.floor(Stoppos.top/50)+1;
+	   if(this.id=="boat1")
+	   {
+		 Ships.setLocation(Ships.boat[0],[[x,y],[x+1,y]]);
+	   }	
+	   if(this.id=="boat2")
+	   {
+		 Ships.setLocation(Ships.boat[1],[[x,y],[x+1,y]]);
+	   }
+	   if(this.id=="carrier")
+	   {
+		 Ships.setLocation(Ships.carrier,[[x,y],[x+1,y],[x+2,y],[x+3,y],[x+4,y]]);
+	   }
+	   if(this.id=="submarine")
+	   {
+		 Ships.setLocation(Ships.submarine,[[x,y],[x+1,y],[x+2,y]]);
+	   }
+	   if(this.id=="destroyer1")
+	   {
+		 Ships.setLocation(Ships.destroyer[0],[[x,y],[x+1,y],[x+2,y]]);
+	   }
+	   if(this.id=="destroyer2")
+	   {
+		 Ships.setLocation(Ships.destroyer[1],[[x,y],[x+1,y],[x+2,y]]);
+	   }
+	   if(this.id=="battleship")
+	   {
+		Ships.setLocation(Ships.battleship,[[x,y],[x+1,y],[x+2,y],[x+3,y]]);
+	   }
+	   
+    }
+	});
+		//$( ".draggable" ).draggable();
+		
+		
+		$( "#grid" ).droppable({ activeClass: "ui-state-highlight" },{ hoverClass: "drophover" }
+		); 
+		
+
+	
+	//	$( "#grid" ).droppable();
+		
+	
+	
+					
+		
+		
+		
+		
+		$(".rotate0").live('click',function(){
+		//	$(#this.id).
+		$(this).removeClass("rotate0").addClass("rotate90");
+	});
+	
+		$(".rotate90").live('click',function(){
+		//	$(#this.id).
+		$(this).removeClass("rotate90").addClass("rotate180");
+	});
+	
+		$(".rotate180").live('click',function(){
+		//	$(#this.id).
+		$(this).removeClass("rotate180").addClass("rotate270");
+	});
+	
+		$(".rotate270").live('click',function(){
+		//	$(#this.id).
+		$(this).removeClass("rotate270").addClass("rotate0");
+	});
+		
+	
+
+
+
+  $("p").click(function(){
+  
+  
+    var x="";
+x=x +"<table >";
+for (i=1; i<=10; i++)
+  {
+  x=x+"<tr>";
+  for (j=1;j<=10;j++)
+	{
+		x=x+"<td id='myBoard-"+i+"-"+j +"' class='myBoardCell'></td>";
+	}
+   x=x+"</tr>";
+  }
+  x=x +"</table>";
+document.getElementById("grid").innerHTML=x;
+ $("p").hide();
+  });
+  
+  
+  
+  
+});
+
+	var Battleship = {
+                "boardSize" : 10
+            }
+        
+            function loadOpponentBoard()
+            {
+                var opponentBoard = document.createElement("TABLE");
+                for(var opponentBoardRowCount = 1; opponentBoardRowCount<= Battleship.boardSize; opponentBoardRowCount++)
+                {
+                    var opponentBoardRow = document.createElement("TR");
+                    for(var opponentBoardColumnCount = 1; opponentBoardColumnCount <= Battleship.boardSize; opponentBoardColumnCount++)
+                    {
+                        var opponentBoardColumn = document.createElement("TD");
+                        opponentBoardColumn.className = "opponentBoardCell opponentBoardCellDefault";
+                        opponentBoardColumn.id = "opponentBoard" + "-" + opponentBoardRowCount + "-" + opponentBoardColumnCount;
+                        opponentBoardRow.appendChild(opponentBoardColumn);
+                    }
+                    opponentBoard.appendChild(opponentBoardRow);
+                }
+                document.getElementById("opponentBoard").appendChild(opponentBoard);
+            }
+			
+			function startGame()
+  {
+			 shipset = [];
+                shipset.push(Ships.carrier);
+                shipset.push(Ships.battleship);
+                shipset.push(Ships.submarine);
+                shipset.push(Ships.destroyer[0]);
+                shipset.push(Ships.destroyer[1]);
+                shipset.push(Ships.boat[0]);
+                shipset.push(Ships.boat[1]);
+                console.log(JSON.stringify(shipset));
+		
+                  loadOpponentBoard();
+  }
+</script>
+<div id="grid">
+</div>
+<p>click on me</p>
+
+ <div id="opponentBoard"><div></div></div>
+<hr />
+
+
+
+<p id="feedback">
+<span>You've selected:</span> <span id="select-result">none</span>.
+</p>
+
+<ol id="selectable">
+	<li id="carrier" class="ui-widget-content draggable shipCarrier rotate0">Ship 1</li>
+	<li id="battleship" class="ui-widget-content draggable shipBattleship rotate0">Ship 2</li>
+	<li id="submarine" class="ui-widget-content draggable shipSubmarine rotate0">Ship 3</li>
+	<li id="destroyer1" class="ui-widget-content draggable shipDestroyer rotate0">Ship 4</li>
+	<li id="boat1" class="ui-widget-content draggable shipBoat rotate0">Ship 5</li>
+	<li id="destroyer2" class="ui-widget-content draggable shipDestroyer rotate0">Ship 6</li>
+	<li id="boat2" class="ui-widget-content draggable shipBoat rotate0">Ship 7</li>
+</ol>
+
+</div>
+<button onclick="startGame()">Play</button>
+
+</body>
