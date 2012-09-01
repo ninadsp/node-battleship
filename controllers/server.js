@@ -1,4 +1,4 @@
-var Room = require("./room");
+var Room = require("./room").Room;
 
 var roomCounter = 0;
 var roomList = []; // Array containing all the roomIDs
@@ -66,10 +66,3 @@ exports.createRoom = createRoom;
 exports.joinRoom = joinRoom;
 exports.placeShips = placeShips;
 exports.fireShot = fireShot;
-
-
-
-
-
-
-
