@@ -1,6 +1,8 @@
 var Client = function(clientId) {
     var _id = clientId;
+    var _placed = false;
     var _ships = [];
+    var _shots = [];
 
     var shipMaxCounts = {
 	carrier: 1,
@@ -26,6 +28,10 @@ var Client = function(clientId) {
     };
 
     var placeShips = function(ships) {
+	if (_placed) {
+	    throw "Cannot move ships once the game has started.";
+	}
+
 	var i, j;
 
 	var counts = {
@@ -65,7 +71,7 @@ var Client = function(clientId) {
     };
 
     var checkForHit = function(location) {
-	var i, j;
+	var i, j, k;
 
 	var shotResult = {
 	    location: location,
@@ -77,7 +83,15 @@ var Client = function(clientId) {
 	    for (j = 0; j < _ships[i].cellsOccupied.length; j += 1) {
 		if (_ships[i].cellsOccupied[j][0] === location[0] &&
 		    _ships[i].cellsOccupied[j][1] === location[1]) {
+
 		    // Mark the hit first
+		    for (k = 0; k < _ships[i].cellsHit.length; k += 1) {
+			if (_ships[i].cellsHit[k][0] === location[0] &&
+			    _ships[i].cellsHit[k][1] === location[1]) {
+			    throw "Shot already fired at " + location;
+			}
+		    }
+
 		    _ships[i].cellsHit.push(location);
 		    if (_ships[i].cellsHit.length === _ships[i].cellsOccupied.length) {
 			shotResult.type = "sink";
@@ -94,10 +108,14 @@ var Client = function(clientId) {
 	return shotResult;
     };
 
+    var fireShot = function(location) {
+    };
+
     return {
 	getId: getId,
 	placeShips: placeShips,
-	checkForHit: checkForHit
+	checkForHit: checkForHit,
+	fireShot: fireShot
     };
 };
 
@@ -138,6 +156,7 @@ var Room = function(id) {
 	// validate clientId
 	for (i = 0; i < _clients.length; i += 1) {
 	    if (_clients[i].getId() === clientId) {
+		_clients[i].fireShot(location);
 		break;
 	    }
 	}
