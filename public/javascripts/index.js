@@ -27,6 +27,18 @@ $(document).ready(function() {
 		console.log('Room joined : ' + d.roomID);
 	});
 
+    socket.on('bsShipsPlaced', function(d) {
+         console.log('ships placed');
+    });
+
+    socket.on('bsStartGame', function(d) {
+         console.log('game starts');
+    });
+
+    socket.on('bsShotFired', function(d) {
+         console.log('shot fired ' + d);
+    });
+
 	socket.on('bsError', function(d) {
 		console.log('Error received : ' + d);
 	});
