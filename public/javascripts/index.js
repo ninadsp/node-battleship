@@ -10,7 +10,7 @@ $(document).ready(function() {
 			console.log('Requesting server to create a room');
 		}
 		else if(pathname.search('/room/') != -1){
-			var roomID = pathname.match(/\/room\/(\w+))[1];
+			var roomID = pathname.match(/\/room\/(\w+)/)[1];
 			socket.emit('bsJoinRoom', { roomID: roomID });
 			console.log('Requesting a join room on roomID : ' + roomID);
 		}
